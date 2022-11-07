@@ -1,3 +1,5 @@
 .vscode/
 demo and prompt/
 *.bkp
+.vs/
+/main
