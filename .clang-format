@@ -1,0 +1,7 @@
+Language:				Cpp
+BasedOnStyle:			Webkit
+TabWidth:				4
+UseTab:					false
+AlignEscapedNewlines:	Right
+AlignOperands:			true
+AlignTrailingComments:	true
