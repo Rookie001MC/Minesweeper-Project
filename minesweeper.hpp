@@ -1,7 +1,5 @@
 #include <vector>
-
-enum flag_status
-{
+enum flag_status {
     /**
      * Defines the status for the current Cell.
      */
@@ -9,8 +7,7 @@ enum flag_status
     FLAGGED = 1,
     UNSURE = 2
 };
-typedef struct MinesweeperCell
-{
+typedef struct MinesweeperCell {
     /**
      * Defines a Cell in the Minesweeper game.
      */
@@ -19,3 +16,10 @@ typedef struct MinesweeperCell
     flag_status flagged = UNFLAGGED;  // If it has been flagged, defined above.
     unsigned short int neighbors = 0; // How many mines are neighboring the square.
 } MinesweeperCell;
+typedef struct MinesweeperTable {
+    unsigned int nRows;
+    unsigned int nCols;
+    unsigned int nMines;
+    std::vector<std::vector<MinesweeperCell>> solution_field;
+    std::vector<std::vector<MinesweeperCell>> player_field;
+}MinesweeperTable;
