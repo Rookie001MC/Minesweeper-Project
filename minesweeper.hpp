@@ -16,10 +16,3 @@ typedef struct MinesweeperCell {
     flag_status flagged = UNFLAGGED;  // If it has been flagged, defined above.
     unsigned short int neighbors = 0; // How many mines are neighboring the square.
 } MinesweeperCell;
-typedef struct MinesweeperTable {
-    unsigned int nRows;
-    unsigned int nCols;
-    unsigned int nMines;
-    std::vector<std::vector<MinesweeperCell>> solution_field;
-    std::vector<std::vector<MinesweeperCell>> player_field;
-}MinesweeperTable;
