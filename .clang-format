@@ -1,7 +1,15 @@
-Language:				Cpp
-BasedOnStyle:			Webkit
-TabWidth:				4
-UseTab:					false
-AlignEscapedNewlines:	Right
-AlignOperands:			true
-AlignTrailingComments:	true
+---
+BasedOnStyle: Google
+AlignEscapedNewlines: Left
+AlignTrailingComments: 'true'
+BinPackArguments: 'true'
+BinPackParameters: 'true'
+Language: Cpp
+ReflowComments: 'true'
+SortIncludes: 'true'
+SpaceBeforeAssignmentOperators: 'true'
+SpacesBeforeTrailingComments: '5'
+Standard: Auto
+TabWidth: '4'
+UseTab: Never
+BreakBeforeBraces: Stroustrup 
