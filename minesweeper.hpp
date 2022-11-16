@@ -1,4 +1,3 @@
-#include <vector>
 enum flag_status {
     /**
      * Defines the status for the current Cell.
