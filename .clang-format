@@ -13,3 +13,4 @@ Standard: Auto
 TabWidth: '4'
 UseTab: Never
 BreakBeforeBraces: Stroustrup 
+IndentWidth: '4'
