@@ -4,6 +4,9 @@
 
 #include "util_functions.cpp"
 
+bool game_over = false;
+bool saved_game = false;
+
 std::vector<std::vector<MinesweeperCell>> create_game_field(int rows, int cols,
                                                             int mines);
 void game_logic(std::vector<std::vector<MinesweeperCell>> game_table);
@@ -29,6 +32,7 @@ void start_game()
 
     std::vector<std::vector<MinesweeperCell>> game_field =
         create_game_field(rows, cols, mines);
+    clear_screen();
     game_logic(game_field);
 }
 
@@ -39,8 +43,6 @@ void game_logic(std::vector<std::vector<MinesweeperCell>> game_table)
      *
      * @param game_table the game table itself.
      */
-
-    bool game_over = false;
 
     int move_count = 0;
 
@@ -68,37 +70,57 @@ void print_current_game_table(
     const char UNKNOWN = '?';
 
     // Printing logic
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            if (game_table[i][j].revealed == true) {
-                if (game_table[i][j].mine == true) {
-                    std::cout << MINE;
-                }
-                else {
-                    std::cout << game_table[i][j].neighbors;
-                }
+    for (int i = 0; i <= rows; i++) {
+        if (i == 0) {
+            for (int col_num = 0; col_num <= rows; col_num++) {
+                col_num == 0 ? std::cout << " "
+                                         << "\t"
+                             : std::cout << col_num << "\t";
             }
-            else {
-                if (game_table[i][j].flagged == flag_status::UNSURE) {
-                    std::cout << UNKNOWN;
-                }
-                else if (game_table[i][j].flagged == flag_status::FLAGGED) {
-                    std::cout << FLAGGED;
-                }
-                else {
-                    std::cout << UNREVEALED;
-                }
-            }
+            std::cout << "\n";
         }
-        std::cout << "\n";
+        else {
+            for (int j = 0; j <= cols; j++) {
+                if (j == 0) {
+                    std::cout << i << "\t";
+                }
+                else {
+                    if (game_table[i - 1][j - 1].revealed == true) {
+                        if (game_table[i - 1][j - 1].mine == true) {
+                            std::cout << MINE;
+                        }
+                        else {
+                            std::cout << game_table[i - 1][j - 1].neighbors;
+                        }
+                    }
+                    else {
+                        if (game_table[i - 1][j - 1].flagged ==
+                            flag_status::UNSURE) {
+                            std::cout << UNKNOWN;
+                        }
+                        else if (game_table[i - 1][j - 1].flagged ==
+                                 flag_status::FLAGGED) {
+                            std::cout << FLAGGED;
+                        }
+                        else {
+                            std::cout << UNREVEALED;
+                        }
+                    }
+                    std::cout << "\t";
+                }
+            }
+            std::cout << "\n";
+        }
     }
 }
 
-void make_move(std::vector<std::vector<MinesweeperCell>>& game_table, int rows, int cols)
+void make_move(std::vector<std::vector<MinesweeperCell>>& game_table, int rows,
+               int cols)
 {
     char selection;
-    std::cout << "Make a selection: \n";
-    std::cout << "R - Reveal\nF - Flag\nN - New Game\nQ - Save and Quit Game\n";
+    std::cout << "\nMake a selection: \n";
+    std::cout
+        << "R - Reveal\nF - Flag\nN - New Game\nS - Save Game\nQ - Quit Game\n";
     std::cout << "> ";
     std::cin >> selection;
 
@@ -107,6 +129,22 @@ void make_move(std::vector<std::vector<MinesweeperCell>>& game_table, int rows, 
     }
     else if (selection == 'F' || selection == 'f') {
         flag_cell(game_table, rows, cols);
+    }
+    else if (selection == 'q' || selection == 'Q') {
+        if (saved_game == false) {
+            char confirm_quit;
+            std::cout << "Warning, you have not saved your current game! Do "
+                         "you want to quit? ";
+            std::cin >> confirm_quit;
+            if (confirm_quit == 'y' || confirm_quit == 'Y') {
+                clear_screen();
+                std::cout << "Thank you for playing!\n";
+                exit(0);
+            }
+            else if (confirm_quit == 'n' || confirm_quit == 'N') {
+                return;
+            }
+        }
     }
     else {
         std::cout
@@ -121,7 +159,7 @@ void reveal_cell(std::vector<std::vector<MinesweeperCell>>& game_table,
                  int rows, int cols)
 {
     auto [row, col] = ask_position();
-    if (row > rows || row <= 0 || col > cols || col <= 0) {
+    if (row >= rows || row < 0 || col >= cols || col < 0) {
         std::cout << "Your selection is out of bounds!\n";
     }
     else if (game_table[row][col].revealed == true ||
@@ -130,7 +168,18 @@ void reveal_cell(std::vector<std::vector<MinesweeperCell>>& game_table,
         std::cout << "This cell cannot be opened!\n";
     }
     else {
-        game_table[row][col].revealed = true;
+        if (game_table[row][col].mine == true) {
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    game_table[i][j].revealed = true;
+                    std::cout << "Stepped on a mine! You lost!\n";
+                    print_current_game_table(game_table, rows, cols);
+                    game_over = true;
+                }
+            }
+        }
+        else
+            game_table[row][col].revealed = true;
     }
     return;
 }
