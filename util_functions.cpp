@@ -1,19 +1,20 @@
 #include <Windows.h>
 
+#include <chrono>
 #include <iostream>
 #include <random>
-#include <tuple>
-#include <chrono>
 #include <thread>
+#include <tuple>
 
 #include "minesweeper.hpp"
 
 int random_num_gen(int from, int to)
 {
     /**
-     * A *really really* overkill number generator function, using the Mersenne
-     * Twister engine. Generates an integer ranging `from` to `to`,
-     * exclusively. Reference:
+     * @brief A *really really* overkill number generator function, using the
+     * Mersenne Twister engine. Generates an integer ranging `from` to `to`,
+     * exclusively.
+     * @see
      * https://learn.microsoft.com/en-us/cpp/standard-library/random?view=msvc-170
      *
      * @param from The starting number of the range
@@ -83,7 +84,8 @@ std::vector<std::vector<MinesweeperCell> > create_game_field(int rows, int cols,
                                                              int mines)
 {
     /**
-     * Creates the `board`, which contains the cell data and mine positions,
+     * @brief Creates the `board`, which contains the cell data and mine
+     * positions,
      *
      * @param rows Number of rows
      * @param cols Number of mines
@@ -151,13 +153,40 @@ std::vector<std::vector<MinesweeperCell> > create_game_field(int rows, int cols,
 }
 std::tuple<int, int> ask_position()
 {
+    /**
+     * @brief Ask the user for position for further processing
+     *
+     * @return Tuple consisting of the user input - 1
+     */
+
     int row, col;
     std::cout << "Enter your desired position (row, column): ";
     std::cin >> row >> col;
     return std::make_tuple(row - 1, col - 1);
 }
 
-void clear_screen() { std::cout << "\033[2J\033[1;1H"; }
-void sleep(int milliseconds) {
+void clear_screen()
+{
+    /**
+     * @brief Clear the screen, the crossplatform-er and safer way.
+     *
+     * @see https://stackoverflow.com/a/32008479
+     * @bug This will only work with systems with ANSI support (Win10 Build 1511
+     * or later, Linux, MacOS).
+     *
+     */
+
+    std::cout << "\033[2J\033[1;1H";
+}
+void sleep(int milliseconds)
+{
+    /** @brief Pause execution of the program, similar to Windows.h's Sleep(),
+     * the crossplatform-er way.
+     *
+     * @see https://stackoverflow.com/a/11276503
+     * @param milliseconds Number of milliseconds to pause execution
+     *
+     */
+
     std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
