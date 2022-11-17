@@ -32,7 +32,6 @@ void start_game()
 
     std::vector<std::vector<MinesweeperCell>> game_field =
         create_game_field(rows, cols, mines);
-    clear_screen();
     game_logic(game_field);
 }
 
@@ -54,63 +53,6 @@ void game_logic(std::vector<std::vector<MinesweeperCell>> game_table)
         make_move(game_table, rows, cols);
         // Forcing the game to actually end prematurely, for debugging
         // game_over = true;
-    }
-}
-
-void print_current_game_table(
-    std::vector<std::vector<MinesweeperCell>>& game_table, int rows, int cols)
-{
-    /**
-     * Prints the current game table.
-     */
-    // Characters to be used for printing to console
-    const char UNREVEALED = '.';
-    const char MINE = '*';
-    const char FLAGGED = 'F';
-    const char UNKNOWN = '?';
-
-    // Printing logic
-    for (int i = 0; i <= rows; i++) {
-        if (i == 0) {
-            for (int col_num = 0; col_num <= rows; col_num++) {
-                col_num == 0 ? std::cout << " "
-                                         << "\t"
-                             : std::cout << col_num << "\t";
-            }
-            std::cout << "\n";
-        }
-        else {
-            for (int j = 0; j <= cols; j++) {
-                if (j == 0) {
-                    std::cout << i << "\t";
-                }
-                else {
-                    if (game_table[i - 1][j - 1].revealed == true) {
-                        if (game_table[i - 1][j - 1].mine == true) {
-                            std::cout << MINE;
-                        }
-                        else {
-                            std::cout << game_table[i - 1][j - 1].neighbors;
-                        }
-                    }
-                    else {
-                        if (game_table[i - 1][j - 1].flagged ==
-                            flag_status::UNSURE) {
-                            std::cout << UNKNOWN;
-                        }
-                        else if (game_table[i - 1][j - 1].flagged ==
-                                 flag_status::FLAGGED) {
-                            std::cout << FLAGGED;
-                        }
-                        else {
-                            std::cout << UNREVEALED;
-                        }
-                    }
-                    std::cout << "\t";
-                }
-            }
-            std::cout << "\n";
-        }
     }
 }
 
@@ -171,12 +113,14 @@ void reveal_cell(std::vector<std::vector<MinesweeperCell>>& game_table,
         if (game_table[row][col].mine == true) {
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
-                    game_table[i][j].revealed = true;
-                    std::cout << "Stepped on a mine! You lost!\n";
-                    print_current_game_table(game_table, rows, cols);
-                    game_over = true;
+                    if (game_table[i][j].mine == true)
+                        game_table[i][j].revealed = true;
                 }
             }
+            print_current_game_table(game_table, rows, cols);
+            std::cout << "Stepped on a mine! You lost!\n";
+            game_over = true;
+            exit(0);
         }
         else
             game_table[row][col].revealed = true;

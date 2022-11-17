@@ -80,8 +80,8 @@ std::tuple<int, int, int> difficulty()
     return std::make_tuple(height, width, mines);
 }
 
-std::vector<std::vector<MinesweeperCell> > create_game_field(int rows, int cols,
-                                                             int mines)
+std::vector<std::vector<MinesweeperCell>> create_game_field(int rows, int cols,
+                                                            int mines)
 {
     /**
      * @brief Creates the `board`, which contains the cell data and mine
@@ -95,7 +95,7 @@ std::vector<std::vector<MinesweeperCell> > create_game_field(int rows, int cols,
      */
 
     // Creates the solution field
-    std::vector<std::vector<MinesweeperCell> > table(
+    std::vector<std::vector<MinesweeperCell>> table(
         rows, std::vector<MinesweeperCell>(cols));
 
     // Fill in the board with MinesweeperCells
@@ -189,4 +189,70 @@ void sleep(int milliseconds)
      */
 
     std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+}
+void print_current_game_table(
+    std::vector<std::vector<MinesweeperCell>>& game_table, int rows, int cols)
+{
+    /**
+     * Prints the current game table.
+     */
+    // Characters to be used for printing to console
+    const char UNREVEALED = '.';
+    const char MINE = '*';
+    const char FLAGGED = 'F';
+    const char UNKNOWN = '?';
+
+    clear_screen();
+    // Printing logic
+    for (int i = 0; i <= rows; i++) {
+        if (i == 0) {
+            for (int col_num = 0; col_num <= rows; col_num++) {
+                col_num == 0 ? std::cout << " "
+                                         << "\t"
+                             : std::cout << col_num << "\t";
+            }
+            std::cout << "\n";
+        }
+        else {
+            for (int j = 0; j <= cols; j++) {
+                if (j == 0) {
+                    std::cout << i << "\t";
+                }
+                else {
+                    if (game_table[i - 1][j - 1].revealed == true) {
+                        if (game_table[i - 1][j - 1].mine == true) {
+                            std::cout << MINE;
+                        }
+                        else {
+                            game_table[i - 1][j - 1].neighbors == 0
+                                ? std::cout << " "
+                                : std::cout
+                                      << game_table[i - 1][j - 1].neighbors;
+                        }
+                    }
+                    else {
+                        if (game_table[i - 1][j - 1].flagged ==
+                            flag_status::UNSURE) {
+                            std::cout << UNKNOWN;
+                        }
+                        else if (game_table[i - 1][j - 1].flagged ==
+                                 flag_status::FLAGGED) {
+                            std::cout << FLAGGED;
+                        }
+                        else {
+                            std::cout << UNREVEALED;
+                        }
+                    }
+                    std::cout << "\t";
+                }
+            }
+            std::cout << "\n";
+        }
+    }
+}
+
+void flood_fill(std::vector<std::vector<MinesweeperCell>> &game_table, int row, int col, int rows, int cols) {
+    // first, check if the cell that we opened has any neighboring mines:
+    if (game_table[i])
+
 }
