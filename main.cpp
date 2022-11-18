@@ -1,30 +1,8 @@
-#include <iostream>
-#include <tuple>
-#include <vector>
-
 #include "util_functions.cpp"
 
 bool game_over = false;
 bool saved_game = false;
 
-std::vector<std::vector<MinesweeperCell>> create_game_field(int rows, int cols,
-                                                            int mines);
-void game_logic(std::vector<std::vector<MinesweeperCell>> game_table);
-int random_num_gen(int from, int to);
-void print_help_sel();
-std::tuple<int, int, int> difficulty();
-void start_game();
-void print_current_game_table(
-    std::vector<std::vector<MinesweeperCell>>& game_table, int rows, int cols);
-void make_move(std::vector<std::vector<MinesweeperCell>>& game_table, int rows,
-               int cols);
-void reveal_cell(std::vector<std::vector<MinesweeperCell>>& game_table,
-                 int rows, int cols);
-void flag_cell(std::vector<std::vector<MinesweeperCell>>& game_table, int rows,
-               int cols);
-
-void clear_screen();
-void sleep(int milliseconds);
 int main(void) { start_game(); }
 void start_game()
 {
@@ -101,7 +79,7 @@ void reveal_cell(std::vector<std::vector<MinesweeperCell>>& game_table,
                  int rows, int cols)
 {
     auto [row, col] = ask_position();
-    if (row >= rows || row < 0 || col >= cols || col < 0) {
+    if (is_valid_cell(row, col, rows, cols) == false) {
         std::cout << "Your selection is out of bounds!\n";
     }
     else if (game_table[row][col].revealed == true ||
@@ -122,8 +100,9 @@ void reveal_cell(std::vector<std::vector<MinesweeperCell>>& game_table,
             game_over = true;
             exit(0);
         }
-        else
-            game_table[row][col].revealed = true;
+        else {
+            flood_fill(game_table, row, col, rows, cols);
+        }
     }
     return;
 }

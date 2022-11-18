@@ -1,11 +1,3 @@
-#include <Windows.h>
-
-#include <chrono>
-#include <iostream>
-#include <random>
-#include <thread>
-#include <tuple>
-
 #include "minesweeper.hpp"
 
 int random_num_gen(int from, int to)
@@ -48,7 +40,7 @@ std::tuple<int, int, int> difficulty()
 
     while (preset < 0 || preset > 3) {
         std::cout << "That option is unrecognized!\n";
-        Sleep(2000);
+        sleep(2000);
         print_help_sel();
         std::cin >> preset;
     }
@@ -251,8 +243,28 @@ void print_current_game_table(
     }
 }
 
-void flood_fill(std::vector<std::vector<MinesweeperCell>> &game_table, int row, int col, int rows, int cols) {
-    // first, check if the cell that we opened has any neighboring mines:
-    if (game_table[i])
+void flood_fill(std::vector<std::vector<MinesweeperCell>>& game_table, int row,
+                int col, int rows, int cols)
+{
+    // first, check if the cell that we will be opening has any neighboring
+    // mines:
+    if (game_table[row][col].neighbors != 0) {
+        game_table[row][col].revealed =
+            true;     // If there is, then we can just print out the number.
+    }
+    // Else:
+    else {
+        // We recursively open all the surrounding cells:
+        if (is_valid_cell(row, col, rows, cols)) {
+        }
+    }
+}
 
+bool is_valid_cell(int row, int col, int rows, int cols)
+{
+    if (row >= rows || row < 0 || col >= cols || col < 0) {
+        return false;
+    }
+    else
+        return true;
 }
