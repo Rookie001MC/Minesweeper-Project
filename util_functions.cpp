@@ -255,7 +255,7 @@ void print_current_game_table(
 }
 
 void flood_fill(std::vector<std::vector<MinesweeperCell>>& game_table, int row,
-                int col, int rows, int cols)
+                int col, int rows, int cols, int& moves_left)
 {
     for (int col_off = -1; col_off <= 1; col_off++) {
         for (int row_off = -1; row_off <= 1; row_off++) {
@@ -267,7 +267,9 @@ void flood_fill(std::vector<std::vector<MinesweeperCell>>& game_table, int row,
                     game_table[next_row][next_col].revealed == false &&
                     game_table[row][col].neighbors == 0) {
                     game_table[next_row][next_col].revealed = true;
-                    flood_fill(game_table, next_row, next_col, rows, cols);
+                    moves_left--;
+                    flood_fill(game_table, next_row, next_col, rows, cols,
+                               moves_left);
                 }
             }
         }
