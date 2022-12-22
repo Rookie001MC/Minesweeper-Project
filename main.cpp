@@ -2,12 +2,13 @@
 
 bool game_over = false;
 bool saved_game = false;
-
+int moves_left = 0;
 int main(void) { start_game(); }
 void start_game()
 {
     auto [rows, cols, mines] = difficulty();
-
+    game_over = false;
+    moves_left = rows * cols - mines;
     std::vector<std::vector<MinesweeperCell>> game_field =
         create_game_field(rows, cols, mines);
     game_logic(game_field);
@@ -26,7 +27,17 @@ void game_logic(std::vector<std::vector<MinesweeperCell>> game_table)
 
     while (game_over == false) {
         print_current_game_table(game_table, rows, cols);
+        printf_s("Moves left: %i", moves_left);
+        if (moves_left == 0) {
+            game_over = true;
+            std::cout << "You won!\n";
+            break;
+        }
         make_move(game_table, rows, cols);
+    }
+
+    if (game_over == true) {
+        ask_for_replay();
     }
 }
 
@@ -41,7 +52,7 @@ void make_move(std::vector<std::vector<MinesweeperCell>>& game_table, int rows,
     std::cin >> selection;
 
     if (selection == 'R' || selection == 'r') {
-        reveal_cell(game_table, rows, cols);
+        reveal_cell(game_table, rows, cols, moves_left);
     }
     else if (selection == 'F' || selection == 'f') {
         flag_cell(game_table, rows, cols);
@@ -72,7 +83,7 @@ void make_move(std::vector<std::vector<MinesweeperCell>>& game_table, int rows,
 }
 
 void reveal_cell(std::vector<std::vector<MinesweeperCell>>& game_table,
-                 int rows, int cols)
+                 int rows, int cols, int& moves_left)
 {
     auto [row, col] = ask_position();
     if (is_valid_cell(row, col, rows, cols) == false) {
@@ -92,12 +103,14 @@ void reveal_cell(std::vector<std::vector<MinesweeperCell>>& game_table,
             }
             print_current_game_table(game_table, rows, cols);
             std::cout << "Stepped on a mine! You lost!\n";
-            ask_for_replay();
+            game_over = true;
+            sleep(3000);
         }
         else {
             game_table[row][col].revealed = true;
+            moves_left--;
             if (game_table[row][col].neighbors == 0) {
-                flood_fill(game_table, row, col, rows, cols);
+                flood_fill(game_table, row, col, rows, cols, moves_left);
             }
         }
     }
@@ -128,7 +141,7 @@ void flag_cell(std::vector<std::vector<MinesweeperCell>>& game_table, int rows,
     return;
 }
 
-bool ask_for_replay()
+void ask_for_replay()
 {
     char sel;
     std::cout << "Do you want to play again? (y/N) ";
