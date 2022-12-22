@@ -108,6 +108,7 @@ std::vector<std::vector<MinesweeperCell>> create_game_field(int rows, int cols,
         }
         else {     // Set the randomized position to be a mine
             table[random_bomb_row][random_bomb_col].mine = true;
+            table[random_bomb_row][random_bomb_col].neighbors = -1;
 
             // Find all the neighboring cells of the mine, then add up
             // the neighbor counts for each neighboring cells
@@ -140,6 +141,16 @@ std::vector<std::vector<MinesweeperCell>> create_game_field(int rows, int cols,
                 table[random_bomb_row + 1][random_bomb_col + 1].neighbors += 1;
         }
     }
+
+    std::cout << "Printing the current game table:\n";
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            printf_s("Cell(%i, %i)  ", table[i][j].mine, table[i][j].neighbors);
+        }
+        printf_s("\n");
+    }
+
+    sleep(3000);
 
     return table;
 }
@@ -246,16 +257,19 @@ void print_current_game_table(
 void flood_fill(std::vector<std::vector<MinesweeperCell>>& game_table, int row,
                 int col, int rows, int cols)
 {
-    // first, check if the cell that we will be opening has any neighboring
-    // mines:
-    if (game_table[row][col].neighbors != 0) {
-        game_table[row][col].revealed =
-            true;     // If there is, then we can just print out the number.
-    }
-    // Else:
-    else {
-        // We recursively open all the surrounding cells:
-        if (is_valid_cell(row, col, rows, cols)) {
+    for (int col_off = -1; col_off <= 1; col_off++) {
+        for (int row_off = -1; row_off <= 1; row_off++) {
+            int next_col = col + col_off;
+            int next_row = row + row_off;
+            if (next_col > -1 && next_col < cols && next_row > -1 &&
+                next_row < rows) {
+                if (game_table[next_row][next_col].mine == false &&
+                    game_table[next_row][next_col].revealed == false &&
+                    game_table[row][col].neighbors == 0) {
+                    game_table[next_row][next_col].revealed = true;
+                    flood_fill(game_table, next_row, next_col, rows, cols);
+                }
+            }
         }
     }
 }
