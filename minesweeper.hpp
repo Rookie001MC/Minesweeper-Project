@@ -37,12 +37,12 @@ void print_current_game_table(
 void make_move(std::vector<std::vector<MinesweeperCell>>& game_table, int rows,
                int cols);
 void reveal_cell(std::vector<std::vector<MinesweeperCell>>& game_table,
-                 int rows, int cols);
+                 int rows, int cols, int& moves_left);
 void flag_cell(std::vector<std::vector<MinesweeperCell>>& game_table, int rows,
                int cols);
 std::vector<std::vector<MinesweeperCell>> create_game_field(int rows, int cols,
                                                             int mines);
 bool is_valid_cell(int row, int col, int rows, int cols);
-bool ask_for_replay();
+void ask_for_replay();
 void clear_screen();
 void sleep(int milliseconds);
