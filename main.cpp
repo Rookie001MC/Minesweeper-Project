@@ -1,9 +1,10 @@
 #include "util_functions.cpp"
 
 bool game_over = false;
-bool saved_game = false;
+bool game_saved = false;
 int moves_left = 0;
-int main(void) { start_game(); }
+
+int main() { start_game(); }
 void start_game()
 {
     auto [rows, cols, mines] = difficulty();
@@ -11,10 +12,10 @@ void start_game()
     moves_left = rows * cols - mines;
     std::vector<std::vector<MinesweeperCell>> game_field =
         create_game_field(rows, cols, mines);
-    game_logic(game_field);
+    game_logic(game_field, mines);
 }
 
-void game_logic(std::vector<std::vector<MinesweeperCell>> game_table)
+void game_logic(std::vector<std::vector<MinesweeperCell>> game_table, int mines)
 {
     /**
      * Handles the game logic
@@ -33,7 +34,7 @@ void game_logic(std::vector<std::vector<MinesweeperCell>> game_table)
             std::cout << "You won!\n";
             break;
         }
-        make_move(game_table, rows, cols);
+        make_move(game_table, rows, cols, mines);
     }
 
     if (game_over == true) {
@@ -42,7 +43,7 @@ void game_logic(std::vector<std::vector<MinesweeperCell>> game_table)
 }
 
 void make_move(std::vector<std::vector<MinesweeperCell>>& game_table, int rows,
-               int cols)
+               int cols, int mines)
 {
     char selection;
     std::cout << "\nMake a selection: \n";
@@ -58,20 +59,27 @@ void make_move(std::vector<std::vector<MinesweeperCell>>& game_table, int rows,
         flag_cell(game_table, rows, cols);
     }
     else if (selection == 'q' || selection == 'Q') {
-        if (saved_game == false) {
-            char confirm_quit;
-            std::cout << "Warning, you have not saved your current game! Do "
-                         "you want to quit? ";
-            std::cin >> confirm_quit;
-            if (confirm_quit == 'y' || confirm_quit == 'Y') {
-                clear_screen();
-                std::cout << "Thank you for playing!\n";
-                exit(0);
-            }
-            else if (confirm_quit == 'n' || confirm_quit == 'N') {
-                return;
-            }
+        if (game_saved == false) {
+            std::cout << "Warning, you have not saved your current game!\n";
         }
+        else {
+            std::cout << "You have saved your current game.\n";
+        }
+        char confirm_quit;
+        std::cout << "Do you want to quit? (y/N) ";
+        std::cin >> confirm_quit;
+        if (confirm_quit == 'y' || confirm_quit == 'Y') {
+            clear_screen();
+            std::cout << "Thank you for playing!\n";
+            exit(0);
+        }
+        else if (confirm_quit == 'n' || confirm_quit == 'N' ||
+                 confirm_quit == ' ') {
+            return;
+        }
+    }
+    else if (selection == 's' || selection == 'S') {
+        save_current_game(game_table, rows, cols, mines);
     }
     else {
         std::cout
@@ -155,4 +163,47 @@ void ask_for_replay()
         std::cout << "Thank you for playing!\n";
         exit(0);
     }
+}
+
+void save_current_game(std::vector<std::vector<MinesweeperCell>>& game_table,
+                       int rows, int cols, int mines)
+{
+    std::cout << "Saving current game...\n";
+    // open save file first:
+    std::ofstream GameSaveFile;
+    GameSaveFile.open("game_save.txt");     // I gave up trying to deal with
+                                            // file paths in c++.
+
+    if (GameSaveFile.is_open()) {
+        // First line: row col mines
+        GameSaveFile << rows << " " << cols << " " << mines << '\n';
+        // Second lines: neighbors + mines
+        // -1 for mines, 0 - 9 for mines
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                int neighbors = game_table[i][j].neighbors;
+                GameSaveFile << neighbors << " ";
+            }
+            GameSaveFile << "\n";
+        }
+        // Final lines: Revealed cells
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                int current_cell = game_table[i][j].revealed;
+                GameSaveFile << current_cell << " ";
+            }
+            GameSaveFile << "\n";
+        }
+
+        game_saved = true;
+        std::cout << "Game has been saved.\n";
+        sleep(1500);
+    }
+    else if (GameSaveFile.fail()) {
+        std::cerr << "An error has occured while saving the game: \n";
+        std::cerr << std::strerror(errno);
+        sleep(1500);
+    }
+
+    GameSaveFile.close();
 }
