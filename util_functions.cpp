@@ -142,16 +142,6 @@ std::vector<std::vector<MinesweeperCell>> create_game_field(int rows, int cols,
         }
     }
 
-    std::cout << "Printing the current game table:\n";
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            printf_s("Cell(%i, %i)  ", table[i][j].mine, table[i][j].neighbors);
-        }
-        printf_s("\n");
-    }
-
-    sleep(3000);
-
     return table;
 }
 std::tuple<int, int> ask_position()
