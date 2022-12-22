@@ -21,16 +21,12 @@ void game_logic(std::vector<std::vector<MinesweeperCell>> game_table)
      * @param game_table the game table itself.
      */
 
-    int move_count = 0;
-
     const int rows = game_table.size();
     const int cols = game_table[0].size();
 
     while (game_over == false) {
         print_current_game_table(game_table, rows, cols);
         make_move(game_table, rows, cols);
-        // Forcing the game to actually end prematurely, for debugging
-        // game_over = true;
     }
 }
 
@@ -91,17 +87,18 @@ void reveal_cell(std::vector<std::vector<MinesweeperCell>>& game_table,
         if (game_table[row][col].mine == true) {
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
-                    if (game_table[i][j].mine == true)
-                        game_table[i][j].revealed = true;
+                    game_table[i][j].revealed = true;
                 }
             }
             print_current_game_table(game_table, rows, cols);
             std::cout << "Stepped on a mine! You lost!\n";
-            game_over = true;
-            exit(0);
+            ask_for_replay();
         }
         else {
-            flood_fill(game_table, row, col, rows, cols);
+            game_table[row][col].revealed = true;
+            if (game_table[row][col].neighbors == 0) {
+                flood_fill(game_table, row, col, rows, cols);
+            }
         }
     }
     return;
@@ -129,4 +126,20 @@ void flag_cell(std::vector<std::vector<MinesweeperCell>>& game_table, int rows,
         }
     }
     return;
+}
+
+bool ask_for_replay()
+{
+    char sel;
+    std::cout << "Do you want to play again? (y/N) ";
+    std::cin >> sel;
+
+    if (sel == 'y' || sel == 'Y') {
+        start_game();
+    }
+    else if (sel == 'n' || sel == 'N' || sel == ' ') {
+        clear_screen();
+        std::cout << "Thank you for playing!\n";
+        exit(0);
+    }
 }
