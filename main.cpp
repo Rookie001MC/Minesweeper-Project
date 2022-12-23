@@ -1,10 +1,17 @@
+#include <filesystem>
+
 #include "util_functions.cpp"
 
 bool game_over = false;
 bool game_saved = false;
 int moves_left = 0;
+std::string current_exe_dir = "";
 
-int main() { start_game(); }
+int main(int argc, char* argv[])
+{
+    current_exe_dir = argv[0];
+    start_game();
+}
 void start_game()
 {
     auto [rows, cols, mines] = difficulty();
@@ -169,12 +176,16 @@ void save_current_game(std::vector<std::vector<MinesweeperCell>>& game_table,
                        int rows, int cols, int mines)
 {
     std::cout << "Saving current game...\n";
+    // Getting the current EXE path
+    std::filesystem::path cwd =
+        (std::filesystem::path(current_exe_dir).parent_path());
+    std::string save_file_loc = (cwd / "game_save.txt").generic_string();
     // open save file first:
     std::ofstream GameSaveFile;
-    GameSaveFile.open("game_save.txt");     // I gave up trying to deal with
-                                            // file paths in c++.
+    GameSaveFile.open(save_file_loc); 
 
     if (GameSaveFile.is_open()) {
+        // Define the path for the save file (at where the EXE is)
         // First line: row col mines
         GameSaveFile << rows << " " << cols << " " << mines << '\n';
         // Second lines: neighbors + mines
