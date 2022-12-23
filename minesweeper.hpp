@@ -35,7 +35,8 @@ void game_logic(std::vector<std::vector<MinesweeperCell>> game_table,
 int random_num_gen(int from, int to);
 void print_help_sel();
 std::tuple<int, int, int> difficulty();
-void start_game();
+void start_new_game();
+std::tuple<int, int> ask_position();
 void print_current_game_table(
     std::vector<std::vector<MinesweeperCell>>& game_table, int rows, int cols);
 void make_move(std::vector<std::vector<MinesweeperCell>>& game_table, int rows,
@@ -44,11 +45,18 @@ void reveal_cell(std::vector<std::vector<MinesweeperCell>>& game_table,
                  int rows, int cols, int& moves_left);
 void flag_cell(std::vector<std::vector<MinesweeperCell>>& game_table, int rows,
                int cols);
-std::vector<std::vector<MinesweeperCell>> create_game_field(int rows, int cols,
-                                                            int mines);
-bool is_valid_cell(int row, int col, int rows, int cols, int mines);
+std::vector<std::vector<MinesweeperCell>> create_new_game_field(int rows,
+                                                                int cols,
+                                                                int mines);
+bool is_valid_cell(int row, int col, int rows, int cols);
+void flood_fill(std::vector<std::vector<MinesweeperCell>>& game_table, int row,
+                int col, int rows, int cols, int& moves_left);
 void save_current_game(std::vector<std::vector<MinesweeperCell>>& game_table,
-                       int rows, int cols, int mines);
+                       int rows, int cols, int mines, int moves_left);
+void load_saved_game();
 void ask_for_replay();
 void clear_screen();
 void sleep(int milliseconds);
+bool if_saved_file_exist(std::string current_dir);
+std::filesystem::path get_current_game_location(std::string current_dir);
+std::string get_save_file_path(std::string current_dir);
