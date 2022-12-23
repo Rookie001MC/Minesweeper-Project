@@ -72,8 +72,9 @@ std::tuple<int, int, int> difficulty()
     return std::make_tuple(height, width, mines);
 }
 
-std::vector<std::vector<MinesweeperCell>> create_game_field(int rows, int cols,
-                                                            int mines)
+std::vector<std::vector<MinesweeperCell>> create_new_game_field(int rows,
+                                                                int cols,
+                                                                int mines)
 {
     /**
      * @brief Creates the `board`, which contains the cell data and mine
@@ -273,4 +274,21 @@ bool is_valid_cell(int row, int col, int rows, int cols)
     }
     else
         return true;
+}
+
+bool if_saved_file_exist(std::string current_dir)
+{
+    std::string save_file_loc = get_save_file_path(current_dir);
+    return (std::filesystem::exists(save_file_loc));
+}
+
+std::string get_save_file_path(std::string current_dir)
+{
+    return (get_current_game_location(current_dir) / "game_save.txt")
+        .generic_string();
+}
+
+std::filesystem::path get_current_game_location(std::string current_dir)
+{
+    return (std::filesystem::path(current_dir).parent_path());
 }
