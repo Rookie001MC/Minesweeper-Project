@@ -1,24 +1,41 @@
-#include <filesystem>
-
-#include "util_functions.cpp"
+#include "minesweeper.hpp"
 
 bool game_over = false;
 bool game_saved = false;
 int moves_left = 0;
 std::string current_exe_dir = "";
-
+std::vector<std::vector<MinesweeperCell>> game_field;
 int main(int argc, char* argv[])
 {
     current_exe_dir = argv[0];
-    start_game();
+    if (if_saved_file_exist(current_exe_dir)) {
+        std::cout << "There is a save file from last game. \nDo you want to "
+                     "load it and continue playing? (y/n) ";
+    load_save_file : {
+        char sel = ' ';
+        std::cin >> sel;
+        if (sel == 'y' || sel == 'Y') {
+            load_saved_game();
+        }
+        else if (sel == 'n' || sel == 'N') {
+            std::filesystem::remove(get_save_file_path(current_exe_dir));
+            start_new_game();
+        }
+        else {
+            std::cout << "Selection is invalid!\nPlease enter Y or N: ";
+            goto load_save_file;
+        }
+    }
+    }
+    else
+        start_new_game();
 }
-void start_game()
+void start_new_game()
 {
     auto [rows, cols, mines] = difficulty();
     game_over = false;
     moves_left = rows * cols - mines;
-    std::vector<std::vector<MinesweeperCell>> game_field =
-        create_game_field(rows, cols, mines);
+    game_field = create_new_game_field(rows, cols, mines);
     game_logic(game_field, mines);
 }
 
@@ -32,7 +49,6 @@ void game_logic(std::vector<std::vector<MinesweeperCell>> game_table, int mines)
 
     const int rows = game_table.size();
     const int cols = game_table[0].size();
-
     while (game_over == false) {
         print_current_game_table(game_table, rows, cols);
         printf_s("Moves left: %i", moves_left);
@@ -86,7 +102,7 @@ void make_move(std::vector<std::vector<MinesweeperCell>>& game_table, int rows,
         }
     }
     else if (selection == 's' || selection == 'S') {
-        save_current_game(game_table, rows, cols, mines);
+        save_current_game(game_table, rows, cols, mines, moves_left);
     }
     else {
         std::cout
@@ -163,7 +179,7 @@ void ask_for_replay()
     std::cin >> sel;
 
     if (sel == 'y' || sel == 'Y') {
-        start_game();
+        start_new_game();
     }
     else if (sel == 'n' || sel == 'N' || sel == ' ') {
         clear_screen();
@@ -173,22 +189,22 @@ void ask_for_replay()
 }
 
 void save_current_game(std::vector<std::vector<MinesweeperCell>>& game_table,
-                       int rows, int cols, int mines)
+                       int rows, int cols, int mines, int moves_left)
 {
     std::cout << "Saving current game...\n";
     // Getting the current EXE path
-    std::filesystem::path cwd =
-        (std::filesystem::path(current_exe_dir).parent_path());
-    std::string save_file_loc = (cwd / "game_save.txt").generic_string();
+    std::string save_file_loc = get_save_file_path(current_exe_dir);
+
     // open save file first:
     std::ofstream GameSaveFile;
-    GameSaveFile.open(save_file_loc); 
+    GameSaveFile.open(save_file_loc);
 
     if (GameSaveFile.is_open()) {
-        // Define the path for the save file (at where the EXE is)
         // First line: row col mines
         GameSaveFile << rows << " " << cols << " " << mines << '\n';
-        // Second lines: neighbors + mines
+        // Second line: moves left
+        GameSaveFile << moves_left << "\n";
+        // Third lines: neighbors + mines
         // -1 for mines, 0 - 9 for mines
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -197,11 +213,20 @@ void save_current_game(std::vector<std::vector<MinesweeperCell>>& game_table,
             }
             GameSaveFile << "\n";
         }
-        // Final lines: Revealed cells
+        // Final lines: Revealed/flagged cells
+        // -2 for unsures, -1 for flagged, 0 for unrevealed, 1 for revealed
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                int current_cell = game_table[i][j].revealed;
-                GameSaveFile << current_cell << " ";
+                MinesweeperCell current_cell = game_table[i][j];
+                if (current_cell.flagged == flag_status::UNSURE) {
+                    GameSaveFile << -2 << " ";
+                }
+                else if (current_cell.flagged == flag_status::FLAGGED) {
+                    GameSaveFile << -1 << " ";
+                }
+                else {
+                    GameSaveFile << current_cell.revealed << " ";
+                }
             }
             GameSaveFile << "\n";
         }
@@ -217,4 +242,65 @@ void save_current_game(std::vector<std::vector<MinesweeperCell>>& game_table,
     }
 
     GameSaveFile.close();
+}
+
+void load_saved_game()
+{
+    std::string save_file_loc = get_save_file_path(current_exe_dir);
+
+    std::ifstream GameLoadFile;
+    GameLoadFile.open(save_file_loc);
+
+    int rows, cols, mines;
+    if (GameLoadFile.is_open()) {
+        printf("Loaded save file correctly!\n");
+        // Load the rows, cols and mine positions
+        GameLoadFile >> rows >> cols >> mines >> moves_left;
+
+        // Initialize an empty game table as soon as the file has successfuly
+        // opened
+        game_field = std::vector<std::vector<MinesweeperCell>>(
+            rows, std::vector<MinesweeperCell>(cols));
+
+        // Load the mine/neighbors values
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                int current_cell_data;
+                GameLoadFile >> current_cell_data;
+                if (current_cell_data == -1) {
+                    game_field[i][j].mine = true;
+                }
+                game_field[i][j].neighbors = current_cell_data;
+            }
+        }
+
+        // Load the revealed/flagged status
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                int current_cell_data;
+                GameLoadFile >> current_cell_data;
+                if (current_cell_data == -2) {
+                    game_field[i][j].flagged = flag_status::UNSURE;
+                }
+                else if (current_cell_data == -1) {
+                    game_field[i][j].flagged = flag_status::FLAGGED;
+                }
+                else {
+                    game_field[i][j].revealed = current_cell_data;
+                }
+            }
+        }
+        GameLoadFile.close();
+        std::cout << "Game loaded successfully! Continuing game...";
+        sleep(2000);
+        game_logic(game_field, mines);
+    }
+    else if (GameLoadFile.fail()) {
+        std::cerr << "An error has occured while loading the game: \n";
+        std::cerr << std::strerror(errno);
+
+        std::cout << "Starting a new game instead...";
+        start_new_game();
+        sleep(1500);
+    }
 }
