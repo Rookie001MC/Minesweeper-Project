@@ -1,16 +1,29 @@
----
-BasedOnStyle: Google
-AlignEscapedNewlines: Left
-AlignTrailingComments: 'true'
-BinPackArguments: 'true'
-BinPackParameters: 'true'
-Language: Cpp
-ReflowComments: 'true'
-SortIncludes: 'true'
-SpaceBeforeAssignmentOperators: 'true'
-SpacesBeforeTrailingComments: '5'
-Standard: Auto
-TabWidth: '4'
+# Style heavily based on OpenTelemetry's Clang-Format:
+# https://github.com/open-telemetry/opentelemetry-cpp/blob/main/.clang-format
+BasedOnStyle: Chromium
+Standard: Cpp11
+InsertBraces: true
 UseTab: Never
-BreakBeforeBraces: Stroustrup 
-IndentWidth: '4'
+IndentWidth: 4
+ColumnLimit: 100
+IndentCaseLabels: true
+PointerAlignment: Right
+IncludeBlocks: Preserve
+AlignOperands: true
+AlignConsecutiveAssignments: true
+BreakBeforeBraces: Custom
+BraceWrapping:
+#  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: true
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
