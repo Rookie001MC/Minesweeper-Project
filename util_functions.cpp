@@ -152,7 +152,7 @@ std::tuple<int, int> ask_position()
      * @return Tuple consisting of the user input - 1
      */
 
-    int row, col;
+    unsigned int row = 0, col = 0;
     std::cout << "Enter your desired position (row, column): ";
     std::cin >> row >> col;
     return std::make_tuple(row - 1, col - 1);
