@@ -1,6 +1,7 @@
 // =================== HEADERS =================== //
 #include <chrono>
 #include <cstdio>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>

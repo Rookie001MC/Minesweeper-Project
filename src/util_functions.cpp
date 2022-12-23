@@ -23,6 +23,7 @@ int random_num_gen(int from, int to)
 }
 void print_help_sel()
 {
+    
     std::cout << "Pick a grid preset: \n";
     std::cout << "0. Custom (default)\n";
     std::cout << "1. Easy - 8x8 - 10 mines\n";

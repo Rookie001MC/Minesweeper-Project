@@ -58,7 +58,7 @@ void game_logic(std::vector<std::vector<MinesweeperCell>> game_table, int mines)
     while (game_over == false)
     {
         print_current_game_table(game_table, rows, cols);
-        printf_s("Moves left: %i", moves_left);
+        printf("Moves left: %i", moves_left);
         if (moves_left == 0)
         {
             game_over = true;
@@ -348,7 +348,7 @@ void load_saved_game()
     }
     else if (GameLoadFile.fail())
     {
-        std::cerr << "An error has occured while loading the game: \n";
+        std::cerr << "An error has occured while loading the game\n";
         std::cerr << std::strerror(errno);
 
         std::cout << "Starting a new game instead...";
