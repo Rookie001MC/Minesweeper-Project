@@ -224,7 +224,7 @@ void flag_cell(std::vector<std::vector<MinesweeperCell>> &game_table, int rows, 
      * @param cols Number of columns of the current game table
      */
     auto [row, col] = ask_position();
-    if (is_valid_cell(row, col, rows, cols) == true)
+    if (is_valid_cell(row, col, rows, cols) == false)
     {
         std::cout << "Your selection is out of bounds!\n";
     }
