@@ -1,82 +1,16 @@
+/**
+ * @file util_functions.cpp
+ * @author Nguyen Huu Quoc Thang
+ * @brief Contains the functions that are necessary for the functionality of the game, but shouldn't
+ * be put into the main file
+ * @date 2022-12-23
+ *
+ * RookieSweeper, because I have no idea what abomination I have coded in 10 weeks straight.
+ *
+ * @note This may be the worst code you may have ever seen, but, I haven't study C++ for a long
+ * time, and I'm not even good at programming either.
+ */
 #include "minesweeper.hpp"
-
-int random_num_gen(int from, int to)
-{
-    /**
-     * @brief A *really really* overkill number generator function, using the
-     * Mersenne Twister engine. Generates an integer ranging `from` to `to`,
-     * exclusively.
-     * @see
-     * https://learn.microsoft.com/en-us/cpp/standard-library/random?view=msvc-170
-     *
-     * @param from The starting number of the range
-     * @param to The ending number of the range
-     *
-     * @return a new random integer
-     */
-
-    std::random_device rd;
-    std::mt19937 rng_engine(rd());
-    std::uniform_int_distribution<int> dist(from, to - 1);
-
-    return dist(rng_engine);
-}
-void print_help_sel()
-{
-    
-    std::cout << "Pick a grid preset: \n";
-    std::cout << "0. Custom (default)\n";
-    std::cout << "1. Easy - 8x8 - 10 mines\n";
-    std::cout << "2. Intermediate - 16x16 - 40 mines\n";
-    std::cout << "3. Hard - 30x16 - 99 mines\n";
-}
-std::tuple<int, int, int> difficulty()
-{
-    unsigned int height, width;
-    unsigned int mines;
-    unsigned int preset = 0;
-
-    print_help_sel();
-    std::cin >> preset;
-
-    while (preset < 0 || preset > 3)
-    {
-        std::cout << "That option is unrecognized!\n";
-        sleep(2000);
-        print_help_sel();
-        std::cin >> preset;
-    }
-
-    if (preset == 0)
-    {
-        std::cout << "Enter the height of the grid: ";
-        std::cin >> height;
-        std::cout << "Enter the width of the grid: ";
-        std::cin >> width;
-        std::cout << "Enter the number of mines to randomize: ";
-        std::cin >> mines;
-    }
-    else if (preset == 1)
-    {
-        height = 8;
-        width  = 8;
-        mines  = 10;
-    }
-    else if (preset == 2)
-    {
-        height = 16;
-        width  = 16;
-        mines  = 40;
-    }
-    else if (preset == 3)
-    {
-        height = 40;
-        width  = 16;
-        mines  = 99;
-    }
-
-    return std::make_tuple(height, width, mines);
-}
 
 std::vector<std::vector<MinesweeperCell>> create_new_game_field(int rows, int cols, int mines)
 {
@@ -88,7 +22,7 @@ std::vector<std::vector<MinesweeperCell>> create_new_game_field(int rows, int co
      * @param cols Number of mines
      * @param mines Number of mines
      *
-     * @return still have no idea yet
+     * @return The game table with pre-filled data (mine locations, neighbors, ...)
      */
 
     // Creates the solution field
@@ -165,52 +99,20 @@ std::vector<std::vector<MinesweeperCell>> create_new_game_field(int rows, int co
 
     return table;
 }
-std::tuple<int, int> ask_position()
-{
-    /**
-     * @brief Ask the user for position for further processing
-     *
-     * @return Tuple consisting of the user input - 1
-     */
 
-    unsigned int row = 0, col = 0;
-    std::cout << "Enter your desired position (row, column): ";
-    std::cin >> row >> col;
-    return std::make_tuple(row - 1, col - 1);
-}
-
-void clear_screen()
-{
-    /**
-     * @brief Clear the screen, the crossplatform-er and safer way.
-     *
-     * @see https://stackoverflow.com/a/32008479
-     * @bug This will only work with systems with ANSI support (Win10 Build 1511
-     * or later, Linux, MacOS).
-     *
-     */
-
-    std::cout << "\033[2J\033[1;1H";
-}
-void sleep(int milliseconds)
-{
-    /** @brief Pause execution of the program, similar to Windows.h's Sleep(),
-     * the crossplatform-er way.
-     *
-     * @see https://stackoverflow.com/a/11276503
-     * @param milliseconds Number of milliseconds to pause execution
-     *
-     */
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
-}
 void print_current_game_table(std::vector<std::vector<MinesweeperCell>> &game_table,
                               int rows,
                               int cols)
 {
     /**
-     * Prints the current game table.
+     * @brief Print to stdout the current game table.
+     *
+     * @param game_table Current game table
+     * @param rows Number of rows
+     * @param cols Number of columns
+     *
      */
+
     // Characters to be used for printing to console
     const char UNREVEALED = '.';
     const char MINE       = '*';
@@ -218,7 +120,12 @@ void print_current_game_table(std::vector<std::vector<MinesweeperCell>> &game_ta
     const char UNKNOWN    = '?';
 
     clear_screen();
-    // Printing logic
+
+    /**
+     * @brief The printing logic for the game table
+     *
+     * @note Since we need to
+     */
     for (int i = 0; i <= rows; i++)
     {
         if (i == 0)
@@ -284,6 +191,16 @@ void flood_fill(std::vector<std::vector<MinesweeperCell>> &game_table,
                 int cols,
                 int &moves_left)
 {
+    /**
+     * @brief Flood fill algorithm, also known as how did i wasted so much time just for this one
+     * thing
+     *
+     * @param game_table Current game table
+     * @param row User-inputted row position
+     * @param col User-inputted col position
+     * @param rows Number of rows of the current game table
+     * @param cols Number of cols of the current game table
+     */
     for (int col_off = -1; col_off <= 1; col_off++)
     {
         for (int row_off = -1; row_off <= 1; row_off++)
@@ -305,8 +222,107 @@ void flood_fill(std::vector<std::vector<MinesweeperCell>> &game_table,
     }
 }
 
+int random_num_gen(int from, int to)
+{
+    /**
+     * @brief Generates a random number in a specified range.
+     * A *really really* overkill number generator function, using the
+     * Mersenne Twister engine. Generates an integer ranging `from` to `to`,
+     * exclusively.
+     * @see https://learn.microsoft.com/en-us/cpp/standard-library/random?view=msvc-170
+     *
+     * @param from The starting number of the range
+     * @param to The ending number of the range
+     *
+     * @return a new random integer
+     */
+
+    std::random_device rd;
+    std::mt19937 rng_engine(rd());
+    std::uniform_int_distribution<int> dist(from, to - 1);
+
+    return dist(rng_engine);
+}
+
+std::tuple<int, int, int> difficulty()
+{
+    /**
+     * @brief Ask the user for the desired difficulty to be played
+     * @note These difficuty settings are based on the original Microsoft Minesweeper game.
+     * @return A std::tuple containing 3 values: height, width, and number of mines
+     */
+    unsigned int height, width;
+    unsigned int mines;
+    unsigned int preset = 0;
+
+    print_help_sel();
+    std::cin >> preset;
+
+    while (preset < 0 || preset > 3)
+    {
+        std::cout << "That option is unrecognized!\n";
+        sleep(2000);
+        print_help_sel();
+        std::cin >> preset;
+    }
+
+    if (preset == 0)
+    {
+        std::cout << "Enter the height of the grid: ";
+        std::cin >> height;
+        std::cout << "Enter the width of the grid: ";
+        std::cin >> width;
+        std::cout << "Enter the number of mines to randomize: ";
+        std::cin >> mines;
+    }
+    else if (preset == 1)
+    {
+        height = 8;
+        width  = 8;
+        mines  = 10;
+    }
+    else if (preset == 2)
+    {
+        height = 16;
+        width  = 16;
+        mines  = 40;
+    }
+    else if (preset == 3)
+    {
+        height = 40;
+        width  = 16;
+        mines  = 99;
+    }
+
+    return std::make_tuple(height, width, mines);
+}
+
+std::tuple<int, int> ask_position()
+{
+    /**
+     * @brief Ask the user for position for further processing
+     *
+     * @return Tuple consisting of the user input - 1
+     */
+
+    unsigned int row = 0, col = 0;
+    std::cout << "Enter your desired position (row, column): ";
+    std::cin >> row >> col;
+    return std::make_tuple(row - 1, col - 1);
+}
+
 bool is_valid_cell(int row, int col, int rows, int cols)
 {
+    /**
+     * @brief Check if the cell the the user specified is valid.
+     *
+     * @param row User-inputted row position
+     * @param col User-inputted col position
+     * @param rows Number of rows of the current game table
+     * @param cols Number of cols of the current game table
+     *
+     * @return True if valid, false if not.
+     */
     if (row >= rows || row < 0 || col >= cols || col < 0)
     {
         return false;
@@ -319,16 +335,67 @@ bool is_valid_cell(int row, int col, int rows, int cols)
 
 bool if_saved_file_exist(std::string current_dir)
 {
+    /**
+     * @brief Check the current directory where the game is currently located
+     * @param current_dir The current directory where the game is located
+     * @return True if the save file exists, false if not.
+     */
     std::string save_file_loc = get_save_file_path(current_dir);
     return (std::filesystem::exists(save_file_loc));
 }
 
 std::string get_save_file_path(std::string current_dir)
 {
+    /**
+     * @brief Append the current game location with the hard-coded save file name.
+     * @param current_dir The current directory where the game is located
+     * @return std::string of current game directory
+     */
     return (get_current_game_location(current_dir) / "game_save.txt").generic_string();
 }
 
 std::filesystem::path get_current_game_location(std::string current_dir)
 {
+    /**
+     * @brief Gets the directory where the game is currently located
+     * @param current_dir The current directory where the game is located
+     * @return std::string of current game directory
+     */
     return (std::filesystem::path(current_dir).parent_path());
+}
+
+void print_help_sel()
+{
+    std::cout << "Pick a grid preset: \n";
+    std::cout << "0. Custom (default)\n";
+    std::cout << "1. Easy - 8x8 - 10 mines\n";
+    std::cout << "2. Intermediate - 16x16 - 40 mines\n";
+    std::cout << "3. Hard - 30x16 - 99 mines\n";
+}
+
+void clear_screen()
+{
+    /**
+     * @brief Clear the screen, the crossplatform-er and safer way.
+     *
+     * @see https://stackoverflow.com/a/32008479
+     * @bug This will only work with systems with ANSI support (Win10 Build 1511
+     * or later, Linux, MacOS).
+     *
+     */
+
+    std::cout << "\033[2J\033[1;1H";
+}
+
+void sleep(int milliseconds)
+{
+    /** @brief Pause execution of the program, similar to Windows.h's Sleep(),
+     * the crossplatform-er way.
+     *
+     * @see https://stackoverflow.com/a/11276503
+     * @param milliseconds Number of milliseconds to pause execution
+     *
+     */
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }

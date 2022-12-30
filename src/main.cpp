@@ -1,13 +1,30 @@
+/**
+ * @file main.cpp
+ * @author Nguyen Huu Quoc Thang - 22125091
+ * @brief The main entry file for RookieSweeper
+ * @date 2022-12-23
+ *
+ * RookieSweeper, because I have no idea what abomination I have coded in 10 weeks straight.
+ *
+ * @note This may be the worst code you may have ever seen, but, I haven't study C++ for a long
+ * time, and I'm not even good at programming either.
+ */
 #include "minesweeper.hpp"
 
+// Sets some global variables up just for easier access throughout the program
 bool game_over              = false;
 bool game_saved             = false;
 int moves_left              = 0;
 std::string current_exe_dir = "";
 std::vector<std::vector<MinesweeperCell>> game_field;
+
 int main(int argc, char *argv[])
 {
-    current_exe_dir = argv[0];
+    /**
+     * @brief The main function.
+     * Still does a lot of things before we can actually play the game.
+     */
+    current_exe_dir = argv[0];  // Where is the game located?
     if (if_saved_file_exist(current_exe_dir))
     {
         std::cout << "There is a save file from last game. \nDo you want to "
@@ -21,13 +38,16 @@ int main(int argc, char *argv[])
         }
         else if (sel == 'n' || sel == 'N')
         {
+            // Removing the file in case we don't load the save game, to avoid collisions with next
+            // launches
             std::filesystem::remove(get_save_file_path(current_exe_dir));
             start_new_game();
         }
         else
         {
             std::cout << "Selection is invalid!\nPlease enter Y or N: ";
-            goto load_save_file;
+            goto load_save_file;  // We can all agree this is ugly but I don't care, it works, I'm
+                                  // bad at C++ ¯\_ (ツ)_/¯
         }
     }
     }
@@ -38,6 +58,9 @@ int main(int argc, char *argv[])
 }
 void start_new_game()
 {
+    /**
+     * @brief Starts a new game by asking for difficulty and create the game table
+     */
     auto [rows, cols, mines] = difficulty();
     game_over                = false;
     moves_left               = rows * cols - mines;
@@ -51,6 +74,7 @@ void game_logic(std::vector<std::vector<MinesweeperCell>> game_table, int mines)
      * Handles the game logic
      *
      * @param game_table the game table itself.
+     * @param mines Number of mines in the current game table
      */
 
     const int rows = game_table.size();
@@ -76,6 +100,13 @@ void game_logic(std::vector<std::vector<MinesweeperCell>> game_table, int mines)
 
 void make_move(std::vector<std::vector<MinesweeperCell>> &game_table, int rows, int cols, int mines)
 {
+    /**
+     * @brief Asks the user for their next move
+     *      
+     * @param rows Number of rows of the current game table
+     * @param cols Number of cols of the current game table 
+     * @param mines Number of mines in the current game table
+     */
     char selection;
     std::cout << "\nMake a selection: \n";
     std::cout << "R - Reveal\nF - Flag\nN - New Game\nS - Save Game\nQ - Quit Game\n";
@@ -107,6 +138,7 @@ void make_move(std::vector<std::vector<MinesweeperCell>> &game_table, int rows, 
         {
             clear_screen();
             std::cout << "Thank you for playing!\n";
+            sleep(1500);
             exit(0);
         }
         else if (confirm_quit == 'n' || confirm_quit == 'N' || confirm_quit == ' ')
@@ -120,8 +152,7 @@ void make_move(std::vector<std::vector<MinesweeperCell>> &game_table, int rows, 
     }
     else
     {
-        std::cout << "This feature is either not implemented yet, or the selection "
-                     "is invalid!";
+        std::cout << "Selection is invalid!";
     }
     sleep(500);
     clear_screen();
@@ -132,38 +163,50 @@ void reveal_cell(std::vector<std::vector<MinesweeperCell>> &game_table,
                  int cols,
                  int &moves_left)
 {
+    /**
+     * @brief Ask for a position in the game board, then do some checks to reveal the specified cell
+     *
+     * @param game_table Current game table
+     * @param rows Number of rows of the current game table
+     * @param cols Number of columns of the current game table
+     * @param moves_left Numbers of moves left in this game table
+     */
     auto [row, col] = ask_position();
-    if (is_valid_cell(row, col, rows, cols) == false)
+    if (is_valid_cell(row, col, rows, cols) == false)  // Cell is flagged
     {
         std::cout << "Your selection is out of bounds!\n";
     }
     else if (game_table[row][col].revealed == true || game_table[row][col].flagged == FLAGGED ||
-             game_table[row][col].flagged == UNSURE)
+             game_table[row][col].flagged ==
+                 UNSURE)  // Cell is already flagged/revealed/marked as unsure
     {
         std::cout << "This cell cannot be opened!\n";
     }
-    else
+    else  // Normal state
     {
-        if (game_table[row][col].mine == true)
+        if (game_table[row][col].mine == true)  // *boom*
         {
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < cols; j++)
                 {
+                    // I may actually consider only revealing the mines only but my current setup is
+                    // not worth doing that
                     game_table[i][j].revealed = true;
                 }
             }
             print_current_game_table(game_table, rows, cols);
             std::cout << "Stepped on a mine! You lost!\n";
             game_over = true;
-            sleep(3000);
+            sleep(3000);  // Goes back to `game_logic()`
         }
-        else
+        else  // Safe
         {
             game_table[row][col].revealed = true;
             moves_left--;
             if (game_table[row][col].neighbors == 0)
             {
+                // How the f did I wasted so much time on this
                 flood_fill(game_table, row, col, rows, cols, moves_left);
             }
         }
@@ -173,8 +216,15 @@ void reveal_cell(std::vector<std::vector<MinesweeperCell>> &game_table,
 
 void flag_cell(std::vector<std::vector<MinesweeperCell>> &game_table, int rows, int cols)
 {
+    /**
+     * @brief Same as `reveal_cell()`, but flags cells instead of revealing them
+     *
+     * @param game_table Current game table
+     * @param rows Number of rows of the current game table
+     * @param cols Number of columns of the current game table
+     */
     auto [row, col] = ask_position();
-    if (row > rows || row <= 0 || col > cols || col <= 0)
+    if (is_valid_cell(row, col, rows, cols) == true)
     {
         std::cout << "Your selection is out of bounds!\n";
     }
@@ -202,6 +252,9 @@ void flag_cell(std::vector<std::vector<MinesweeperCell>> &game_table, int rows, 
 
 void ask_for_replay()
 {
+    /**
+     * @brief Ask the user if they want to play a new game
+     */
     char sel;
     std::cout << "Do you want to play again? (y/N) ";
     std::cin >> sel;
@@ -214,6 +267,7 @@ void ask_for_replay()
     {
         clear_screen();
         std::cout << "Thank you for playing!\n";
+        sleep(1500);
         exit(0);
     }
 }
@@ -224,6 +278,16 @@ void save_current_game(std::vector<std::vector<MinesweeperCell>> &game_table,
                        int mines,
                        int moves_left)
 {
+    /**
+     * @brief Save the current game when the user choose the Save feature
+     *
+     * @param rows Number of rows of the current game table
+     * @param cols Number of cols of the current game table
+     * @param mines Number of mines in the current game table
+     * @param moves_left Number of moves left in this current game table
+     *
+     */
+
     std::cout << "Saving current game...\n";
     // Getting the current EXE path
     std::string save_file_loc = get_save_file_path(current_exe_dir);
@@ -288,6 +352,9 @@ void save_current_game(std::vector<std::vector<MinesweeperCell>> &game_table,
 
 void load_saved_game()
 {
+    /**
+     * @brief Load a saved game, if it is found in the same directory as where the game is located.
+     */
     std::string save_file_loc = get_save_file_path(current_exe_dir);
 
     std::ifstream GameLoadFile;
