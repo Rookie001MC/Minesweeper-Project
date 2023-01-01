@@ -20,7 +20,7 @@ std::vector<std::vector<MinesweeperCell>> game_field;
 
 int main(int argc, char *argv[])
 {
-  print_ascii_banner();
+    print_ascii_banner();
     /**
      * @brief The main function.
      * Still does a lot of things before we can actually play the game.
@@ -103,9 +103,9 @@ void make_move(std::vector<std::vector<MinesweeperCell>> &game_table, int rows, 
 {
     /**
      * @brief Asks the user for their next move
-     *      
+     *
      * @param rows Number of rows of the current game table
-     * @param cols Number of cols of the current game table 
+     * @param cols Number of cols of the current game table
      * @param mines Number of mines in the current game table
      */
     char selection;
@@ -421,10 +421,11 @@ void load_saved_game()
         sleep(1500);
     }
 }
-void print_ascii_banner() {
+void print_ascii_banner()
+{
     /**
      * @brief Prints out a very nice ASCII art banner.
-    */
+     */
     std::cout << R"(
 8888888b.                 888     d8b         .d8888b.                                                      
 888   Y88b                888     Y8P        d88P  Y88b                                                     
