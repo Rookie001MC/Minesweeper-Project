@@ -253,20 +253,22 @@ std::tuple<int, int, int> difficulty()
      */
     unsigned int height, width;
     unsigned int mines;
-    unsigned int preset = 0;
+    char preset = '0';
 
     print_help_sel();
     std::cin >> preset;
 
-    while (preset < 0 || preset > 3)
+    while (preset != '0' && preset != '1' && preset != '2' && preset != '3' && preset != 'q' &&
+           preset != 'Q')  // I suck, yes
     {
         std::cout << "That option is unrecognized!\n";
         sleep(2000);
         print_help_sel();
+        preset = '0';
         std::cin >> preset;
     }
 
-    if (preset == 0)
+    if (preset == '0')
     {
         std::cout << "Enter the height of the grid: ";
         std::cin >> height;
@@ -275,23 +277,27 @@ std::tuple<int, int, int> difficulty()
         std::cout << "Enter the number of mines to randomize: ";
         std::cin >> mines;
     }
-    else if (preset == 1)
+    else if (preset == '1')
     {
         height = 8;
         width  = 8;
         mines  = 10;
     }
-    else if (preset == 2)
+    else if (preset == '2')
     {
         height = 16;
         width  = 16;
         mines  = 40;
     }
-    else if (preset == 3)
+    else if (preset == '3')
     {
         height = 40;
         width  = 16;
         mines  = 99;
+    }
+    else if (preset == 'q' || preset == 'Q')
+    {
+        quit_game();
     }
 
     return std::make_tuple(height, width, mines);
@@ -367,10 +373,12 @@ std::filesystem::path get_current_game_location(std::string current_dir)
 void print_help_sel()
 {
     std::cout << "Pick a grid preset: \n";
-    std::cout << "0. Custom (default)\n";
+    std::cout << "0. Custom\n";
     std::cout << "1. Easy - 8x8 - 10 mines\n";
     std::cout << "2. Intermediate - 16x16 - 40 mines\n";
     std::cout << "3. Hard - 30x16 - 99 mines\n";
+    std::cout << "Q - Quit Game\n";
+    std::cout << "> ";
 }
 
 void clear_screen()
@@ -398,4 +406,17 @@ void sleep(int milliseconds)
      */
 
     std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+}
+
+void quit_game()
+{
+    /**
+     * @brief Exits the game.
+     */
+    {
+        clear_screen();
+        std::cout << "Thank you for playing!\n";
+        sleep(1500);
+        exit(0);
+    }
 }
