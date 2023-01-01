@@ -4,20 +4,20 @@
  * @brief
  * @date 2022-12-23
  *
- * RookieSweeper, because I have no idea what abomination I have coded in 10 weeks straight.
+ * RookieSweeper, because I have no idea what abomination I have coded in 10
+ * weeks straight.
  *
- * @note This may be the worst code you may have ever seen, but, I haven't study C++ for a long
- * time, and I'm not even good at programming either.
+ * @note This may be the worst code you may have ever seen, but, I haven't study
+ * C++ for a long time, and I'm not even good at programming either.
  */
 // =================== HEADERS =================== //
 #include <chrono>
-#include <cstdio>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <random>
-#include <thread>
+#include <thread>  // For `sleep()`
 #include <tuple>
 #include <vector>
 
@@ -76,6 +76,7 @@ bool is_valid_cell(int row, int col, int rows, int cols);
 std::vector<std::vector<MinesweeperCell>> create_new_game_field(int rows, int cols, int mines);
 
 // ======== UTILITY FUNCTIONS ========== //
+void print_ascii_banner();
 void print_help_sel();
 int random_num_gen(int from, int to);
 void load_saved_game();
@@ -85,3 +86,4 @@ void sleep(int milliseconds);
 bool if_saved_file_exist(std::string current_dir);
 std::filesystem::path get_current_game_location(std::string current_dir);
 std::string get_save_file_path(std::string current_dir);
+void quit_game();
