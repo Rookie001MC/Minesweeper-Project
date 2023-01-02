@@ -56,43 +56,43 @@ std::vector<std::vector<MinesweeperCell>> create_new_game_field(int rows, int co
             // Find all the neighboring cells of the mine, then add up
             // the neighbor counts for each neighboring cells
             if (random_bomb_row != 0 && random_bomb_col != 0)
-            {  // check for edge
+            {  // North - West
                 table[random_bomb_row - 1][random_bomb_col - 1].neighbors += 1;
             }
 
             if (random_bomb_row != 0)
-            {  // check for edge
+            {  // North
                 table[random_bomb_row - 1][random_bomb_col].neighbors += 1;
             }
 
             if (random_bomb_row != 0 && random_bomb_col != cols - 1)
-            {  // check for edge
+            {  // North - East
                 table[random_bomb_row - 1][random_bomb_col + 1].neighbors += 1;
             }
 
-            if (random_bomb_col != 0)
-            {  // check for edge
-                table[random_bomb_row][random_bomb_col - 1].neighbors += 1;
-            }
-
             if (random_bomb_col != cols - 1)
-            {  // check for edge
+            {  // East
                 table[random_bomb_row][random_bomb_col + 1].neighbors += 1;
             }
 
-            if (random_bomb_row != rows - 1 && random_bomb_col != 0)
-            {  // check for edge
-                table[random_bomb_row + 1][random_bomb_col - 1].neighbors += 1;
+            if (random_bomb_row != rows - 1 && random_bomb_col != cols - 1)
+            {  // South - East
+                table[random_bomb_row + 1][random_bomb_col + 1].neighbors += 1;
             }
 
             if (random_bomb_row != rows - 1)
-            {  // check for edge
+            {  // South
                 table[random_bomb_row + 1][random_bomb_col].neighbors += 1;
             }
 
-            if (random_bomb_row != rows - 1 && random_bomb_col != cols - 1)
-            {  // check for edge
-                table[random_bomb_row + 1][random_bomb_col + 1].neighbors += 1;
+            if (random_bomb_row != rows - 1 && random_bomb_col != 0)
+            {  // South - West
+                table[random_bomb_row + 1][random_bomb_col - 1].neighbors += 1;
+            }
+
+            if (random_bomb_col != 0)
+            {  // West
+                table[random_bomb_row][random_bomb_col - 1].neighbors += 1;
             }
         }
     }
@@ -201,9 +201,9 @@ void flood_fill(std::vector<std::vector<MinesweeperCell>> &game_table,
      * @param rows Number of rows of the current game table
      * @param cols Number of cols of the current game table
      */
-    for (int col_off = -1; col_off <= 1; col_off++)
+    for (int col_off = -1; col_off <= 1; col_off++) // y-axis
     {
-        for (int row_off = -1; row_off <= 1; row_off++)
+            for (int row_off = -1; row_off <= 1; row_off++) // x-axis
         {
             int next_col = col + col_off;
             int next_row = row + row_off;
