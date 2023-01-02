@@ -20,11 +20,11 @@ std::vector<std::vector<MinesweeperCell>> game_field;
 
 int main(int argc, char *argv[])
 {
-    print_ascii_banner();
     /**
      * @brief The main function.
      * Still does a lot of things before we can actually play the game.
      */
+    print_ascii_banner();
     current_exe_dir = argv[0];  // Where is the game located?
     if (if_saved_file_exist(current_exe_dir))
     {
@@ -110,7 +110,10 @@ void make_move(std::vector<std::vector<MinesweeperCell>> &game_table, int rows, 
      */
     char selection;
     std::cout << "\nMake a selection: \n";
-    std::cout << "R - Reveal\nF - Flag\nN - New Game\nS - Save Game\nQ - Quit Game\n";
+    std::cout << "R - Reveal\n"
+              << "F - Flag\n"
+              << "S - Save Game\n"
+              << "Q - Quit Game\n";
     std::cout << "> ";
     std::cin >> selection;
 
@@ -137,10 +140,7 @@ void make_move(std::vector<std::vector<MinesweeperCell>> &game_table, int rows, 
         std::cin >> confirm_quit;
         if (confirm_quit == 'y' || confirm_quit == 'Y')
         {
-            clear_screen();
-            std::cout << "Thank you for playing!\n";
-            sleep(1500);
-            exit(0);
+            quit_game();
         }
         else if (confirm_quit == 'n' || confirm_quit == 'N' || confirm_quit == ' ')
         {
@@ -264,7 +264,7 @@ void ask_for_replay()
     {
         start_new_game();
     }
-    else if (sel == 'n' || sel == 'N' || sel == ' ')
+    else if (sel == 'n' || sel == 'N')
     {
         quit_game();
     }
@@ -417,10 +417,11 @@ void load_saved_game()
         std::cerr << std::strerror(errno);
 
         std::cout << "Starting a new game instead...";
-        start_new_game();
         sleep(1500);
+        start_new_game();
     }
 }
+
 void print_ascii_banner()
 {
     /**
